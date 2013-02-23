@@ -1,14 +1,14 @@
-Name: data-ascii
+Name: text-latin1
 Version: 0.1
-Category: Data
+Category: Text
 Stability: experimental
-Synopsis: ASCII utility functions
+Synopsis: Latin-1 (including ASCII) utility functions
 Description:
-  This package provides various functions over the ASCII portions of
-  the 'Char' and 'Word8' data types.
+  This package provides various functions over the ASCII ang Latin-1
+  portions of the 'Char' and 'Word8' data types.
 
-Homepage: https://github.com/mvv/data-ascii
-Bug-Reports: https://github.com/mvv/data-ascii/issues
+Homepage: https://github.com/mvv/text-latin1
+Bug-Reports: https://github.com/mvv/text-latin1/issues
 
 Author: Mikhail Vorozhtsov <mikhail.vorozhtsov@gmail.com>
 Maintainer: Mikhail Vorozhtsov <mikhail.vorozhtsov@gmail.com>
@@ -21,7 +21,7 @@ Build-Type: Simple
 
 Source-Repository head
   Type: git
-  Location: https://github.com/mvv/data-ascii.git
+  Location: https://github.com/mvv/text-latin1.git
 
 Library
   Build-Depends: base >= 4 && < 5
@@ -31,5 +31,6 @@ Library
   Hs-Source-Dirs: src
   GHC-Options: -Wall
   Exposed-Modules:
-    Data.Ascii
+    Text.Ascii
+    Text.Latin1
 
