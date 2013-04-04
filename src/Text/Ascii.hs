@@ -27,6 +27,11 @@ module Text.Ascii
   , fromDigit
   , fromNzDigit
   , unsafeFromDigit
+  , isBinDigit
+  , isNzBinDigit
+  , fromBinDigit
+  , fromNzBinDigit
+  , unsafeFromBinDigit
   , isOctDigit
   , isNzOctDigit
   , fromOctDigit
@@ -63,6 +68,11 @@ module Text.Ascii
   , fromDigit8
   , fromNzDigit8
   , unsafeFromDigit8
+  , isBinDigit8
+  , isNzBinDigit8
+  , fromBinDigit8
+  , fromNzBinDigit8
+  , unsafeFromBinDigit8
   , isOctDigit8
   , isNzOctDigit8
   , fromOctDigit8
@@ -226,6 +236,34 @@ fromNzDigit c | isNzDigit c = Just $ unsafeFromDigit c
 unsafeFromDigit ∷ Num a ⇒ Char → a
 unsafeFromDigit c = fromIntegral (ord c - ord '0')
 {-# INLINE unsafeFromDigit #-}
+
+-- | Test if a character is a binary digit (/'0'/ or /'1'/).
+isBinDigit ∷ Char → Bool
+isBinDigit c = c == '0' || c == '1'
+{-# INLINE isBinDigit #-}
+
+-- | Test if a character is the non-zero binary digit (/'1'/).
+isNzBinDigit ∷ Char → Bool
+isNzBinDigit c = c == '1'
+{-# INLINE isNzBinDigit #-}
+
+-- | Map binary digits to the corresponding numbers. Return 'Nothing' on
+--   other inputs.
+fromBinDigit ∷ Num a ⇒ Char → Maybe a
+fromBinDigit c | isBinDigit c = Just $ unsafeFromBinDigit c
+               | otherwise    = Nothing
+{-# INLINABLE fromBinDigit #-}
+
+-- | Map the digit /'1'/ to the number /1/. Return 'Nothing' on other inputs.
+fromNzBinDigit ∷ Num a ⇒ Char → Maybe a
+fromNzBinDigit c | isNzBinDigit c = Just 1
+                 | otherwise      = Nothing
+{-# INLINABLE fromNzBinDigit #-}
+
+-- | Map binary digits to the corresponding numbers. No checks is performed.
+unsafeFromBinDigit ∷ Num a ⇒ Char → a
+unsafeFromBinDigit = unsafeFromDigit
+{-# INLINE unsafeFromBinDigit #-}
 
 -- | Test if a character is an octal digit (/'0' ... '7'/).
 isOctDigit ∷ Char → Bool
@@ -465,6 +503,36 @@ fromNzDigit8 w | isNzDigit8 w = Just $ unsafeFromDigit8 w
 unsafeFromDigit8 ∷ Num a ⇒ Word8 → a
 unsafeFromDigit8 w = fromIntegral (w - ascii '0')
 {-# INLINE unsafeFromDigit8 #-}
+
+-- | Test if a byte is the encoding of a binary digit (/'0'/ or /'1'/).
+isBinDigit8 ∷ Word8 → Bool
+isBinDigit8 w = w == ascii '0' || w == ascii '1'
+{-# INLINE isBinDigit8 #-}
+
+-- | Test if a byte is the encoding of the non-zero binary digit (/'1'/).
+isNzBinDigit8 ∷ Word8 → Bool
+isNzBinDigit8 w = w == ascii '1'
+{-# INLINE isNzBinDigit8 #-}
+
+-- | Map the encoding of a binary digit to the corresponding number.
+--   Return 'Nothing' on other inputs.
+fromBinDigit8 ∷ Num a ⇒ Word8 → Maybe a
+fromBinDigit8 w | isBinDigit8 w = Just $ unsafeFromBinDigit8 w
+                | otherwise     = Nothing
+{-# INLINABLE fromBinDigit8 #-}
+
+-- | Map the encoding of the digit /'1'/ to the number /1/.
+--   Return 'Nothing' on other inputs.
+fromNzBinDigit8 ∷ Num a ⇒ Word8 → Maybe a
+fromNzBinDigit8 w | isNzBinDigit8 w = Just 1
+                  | otherwise       = Nothing
+{-# INLINABLE fromNzBinDigit8 #-}
+
+-- | Map the encoding of a binary digit to the corresponding number.
+--   No checks is performed.
+unsafeFromBinDigit8 ∷ Num a ⇒ Word8 → a
+unsafeFromBinDigit8 = unsafeFromDigit8
+{-# INLINE unsafeFromBinDigit8 #-}
 
 -- | Test if a byte is the encoding of an octal digit (/'0' ... '7'/).
 isOctDigit8 ∷ Word8 → Bool
