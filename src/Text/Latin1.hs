@@ -138,7 +138,7 @@ isAlpha c = isUpper c || isLower c
 
 -- | Test if a character is either a Latin-1 letter or a decimal digit.
 isAlphaNum ∷ Char → Bool
-isAlphaNum c = A.isDigit c || isAlpha c
+isAlphaNum c = A.isDecDigit c || isAlpha c
 {-# INLINABLE isAlphaNum #-}
 
 -- | Test if a byte is the encoding of a Latin-1 control character.
@@ -188,6 +188,6 @@ isAlpha8 w = isUpper8 w || isLower8 w
 -- | Test if a byte is the encoding of either a Latin-1 letter
 --   or a decimal digit.
 isAlphaNum8 ∷ Word8 → Bool
-isAlphaNum8 w = A.isDigit8 w || isAlpha8 w
+isAlphaNum8 w = A.isDecDigit8 w || isAlpha8 w
 {-# INLINABLE isAlphaNum8 #-}
 

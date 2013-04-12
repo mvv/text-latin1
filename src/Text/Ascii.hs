@@ -21,12 +21,12 @@ module Text.Ascii
   , toLower
   , toUpper
   , isAlpha
-  , isDigit
-  , isNzDigit
   , isAlphaNum
-  , fromDigit
-  , fromNzDigit
-  , unsafeFromDigit
+  , isDecDigit
+  , isNzDecDigit
+  , fromDecDigit
+  , fromNzDecDigit
+  , unsafeFromDecDigit
   , isBinDigit
   , isNzBinDigit
   , fromBinDigit
@@ -62,12 +62,12 @@ module Text.Ascii
   , toLower8
   , toUpper8
   , isAlpha8
-  , isDigit8
-  , isNzDigit8
   , isAlphaNum8
-  , fromDigit8
-  , fromNzDigit8
-  , unsafeFromDigit8
+  , isDecDigit8
+  , isNzDecDigit8
+  , fromDecDigit8
+  , fromNzDecDigit8
+  , unsafeFromDecDigit8
   , isBinDigit8
   , isNzBinDigit8
   , fromBinDigit8
@@ -203,39 +203,39 @@ isAlpha ∷ Char → Bool
 isAlpha c = isUpper c || isLower c
 {-# INLINABLE isAlpha #-}
 
--- | Test if a character is a decimal digit (/'0' ... '9'/).
-isDigit ∷ Char → Bool
-isDigit c = c >= '0' && c <= '9'
-{-# INLINE isDigit #-}
-
--- | Test if a character is a non-zero decimal digit (/'1' ... '9'/).
-isNzDigit ∷ Char → Bool
-isNzDigit c = c >= '1' && c <= '9'
-{-# INLINE isNzDigit #-}
-
 -- | Test if a character is either an ASCII letter or a decimal digit.
 isAlphaNum ∷ Char → Bool
-isAlphaNum c = isDigit c || isAlpha c
+isAlphaNum c = isDecDigit c || isAlpha c
 {-# INLINABLE isAlphaNum #-}
+
+-- | Test if a character is a decimal digit (/'0' ... '9'/).
+isDecDigit ∷ Char → Bool
+isDecDigit c = c >= '0' && c <= '9'
+{-# INLINE isDecDigit #-}
+
+-- | Test if a character is a non-zero decimal digit (/'1' ... '9'/).
+isNzDecDigit ∷ Char → Bool
+isNzDecDigit c = c >= '1' && c <= '9'
+{-# INLINE isNzDecDigit #-}
 
 -- | Map a decimal digit to the corresponding number. Return 'Nothing' on
 --   other inputs.
-fromDigit ∷ Num a ⇒ Char → Maybe a
-fromDigit c | isDigit c = Just $ unsafeFromDigit c
-            | otherwise = Nothing
-{-# INLINABLE fromDigit #-}
+fromDecDigit ∷ Num a ⇒ Char → Maybe a
+fromDecDigit c | isDecDigit c = Just $ unsafeFromDecDigit c
+               | otherwise    = Nothing
+{-# INLINABLE fromDecDigit #-}
 
 -- | Map non-zero decimal digits to the corresponding numbers. Return
 --   'Nothing' on other inputs.
-fromNzDigit ∷ Num a ⇒ Char → Maybe a
-fromNzDigit c | isNzDigit c = Just $ unsafeFromDigit c
-              | otherwise   = Nothing
-{-# INLINABLE fromNzDigit #-}
+fromNzDecDigit ∷ Num a ⇒ Char → Maybe a
+fromNzDecDigit c | isNzDecDigit c = Just $ unsafeFromDecDigit c
+                 | otherwise      = Nothing
+{-# INLINABLE fromNzDecDigit #-}
 
 -- | Map decimal digits to the corresponding numbers. No checks is performed.
-unsafeFromDigit ∷ Num a ⇒ Char → a
-unsafeFromDigit c = fromIntegral (ord c - ord '0')
-{-# INLINE unsafeFromDigit #-}
+unsafeFromDecDigit ∷ Num a ⇒ Char → a
+unsafeFromDecDigit c = fromIntegral (ord c - ord '0')
+{-# INLINE unsafeFromDecDigit #-}
 
 -- | Test if a character is a binary digit (/'0'/ or /'1'/).
 isBinDigit ∷ Char → Bool
@@ -262,7 +262,7 @@ fromNzBinDigit c | isNzBinDigit c = Just 1
 
 -- | Map binary digits to the corresponding numbers. No checks is performed.
 unsafeFromBinDigit ∷ Num a ⇒ Char → a
-unsafeFromBinDigit = unsafeFromDigit
+unsafeFromBinDigit = unsafeFromDecDigit
 {-# INLINE unsafeFromBinDigit #-}
 
 -- | Test if a character is an octal digit (/'0' ... '7'/).
@@ -291,7 +291,7 @@ fromNzOctDigit c | isNzOctDigit c = Just $ unsafeFromOctDigit c
 
 -- | Map octal digits to the corresponding numbers. No checks is performed.
 unsafeFromOctDigit ∷ Num a ⇒ Char → a
-unsafeFromOctDigit = unsafeFromDigit
+unsafeFromOctDigit = unsafeFromDecDigit
 {-# INLINE unsafeFromOctDigit #-}
 
 isLowAF ∷ Char → Bool
@@ -305,35 +305,35 @@ fromLowAF c = fromIntegral (ord c - ord 'a' + 10)
 -- | Test if a character is a lower-case hexadecimal digit
 --   (/'0' ... '9'/ or /'a' ... 'f'/).
 isLowHexDigit ∷ Char → Bool
-isLowHexDigit c = isDigit c || isLowAF c
+isLowHexDigit c = isDecDigit c || isLowAF c
 {-# INLINABLE isLowHexDigit #-}
 
 -- | Test if a character is a non-zero lower-case hexadecimal digit
 --   (/'1' ... '9'/ or /'a' ... 'f'/).
 isNzLowHexDigit ∷ Char → Bool
-isNzLowHexDigit c = isNzDigit c || isLowAF c
+isNzLowHexDigit c = isNzDecDigit c || isLowAF c
 {-# INLINABLE isNzLowHexDigit #-}
 
 -- | Map lower-case hexadecimal digits to the corresponding numbers.
 --   Return 'Nothing' on other inputs.
 fromLowHexDigit ∷ Num a ⇒ Char → Maybe a
-fromLowHexDigit c | isDigit c = Just $ unsafeFromDigit c
-                  | isLowAF c = Just $ fromLowAF c
-                  | otherwise = Nothing
+fromLowHexDigit c | isDecDigit c = Just $ unsafeFromDecDigit c
+                  | isLowAF c    = Just $ fromLowAF c
+                  | otherwise    = Nothing
 {-# INLINABLE fromLowHexDigit #-}
 
 -- | Map non-zero lower-case hexadecimal digits to the corresponding numbers.
 --   Return 'Nothing' on other inputs.
 fromNzLowHexDigit ∷ Num a ⇒ Char → Maybe a
-fromNzLowHexDigit c | isNzDigit c = Just $ unsafeFromDigit c
-                    | isLowAF c   = Just $ fromLowAF c
-                    | otherwise   = Nothing
+fromNzLowHexDigit c | isNzDecDigit c = Just $ unsafeFromDecDigit c
+                    | isLowAF c      = Just $ fromLowAF c
+                    | otherwise      = Nothing
 {-# INLINABLE fromNzLowHexDigit #-}
 
 -- | Map lower-case hexadecimal digits to the corresponding numbers.
 --   No checks is performed.
 unsafeFromLowHexDigit ∷ Num a ⇒ Char → a
-unsafeFromLowHexDigit c | c < 'a'   = unsafeFromDigit c
+unsafeFromLowHexDigit c | c < 'a'   = unsafeFromDecDigit c
                         | otherwise = fromLowAF c
 {-# INLINE unsafeFromLowHexDigit #-}
 
@@ -348,72 +348,72 @@ fromUpAF c = fromIntegral (ord c - ord 'A' + 10)
 -- | Test if a character is an upper-case hexadecimal digit
 --   (/'0' ... '9'/ or /'A' ... 'F'/).
 isUpHexDigit ∷ Char → Bool
-isUpHexDigit c = isDigit c || isUpAF c
+isUpHexDigit c = isDecDigit c || isUpAF c
 {-# INLINABLE isUpHexDigit #-}
 
 -- | Test if a character is a non-zero upper-case hexadecimal digit
 --   (/'1' ... '9'/ or /'A' ... 'F'/).
 isNzUpHexDigit ∷ Char → Bool
-isNzUpHexDigit c = isNzDigit c || isUpAF c
+isNzUpHexDigit c = isNzDecDigit c || isUpAF c
 {-# INLINABLE isNzUpHexDigit #-}
 
 -- | Map upper-case hexadecimal digits to the corresponding numbers.
 --   Return 'Nothing' on other inputs.
 fromUpHexDigit ∷ Num a ⇒ Char → Maybe a
-fromUpHexDigit c | isDigit c = Just $ unsafeFromDigit c
-                 | isUpAF c  = Just $ fromUpAF c
-                 | otherwise = Nothing
+fromUpHexDigit c | isDecDigit c = Just $ unsafeFromDecDigit c
+                 | isUpAF c     = Just $ fromUpAF c
+                 | otherwise    = Nothing
 {-# INLINABLE fromUpHexDigit #-}
 
 -- | Map non-zero upper-case hexadecimal digits to the corresponding numbers.
 --   Return 'Nothing' on other inputs.
 fromNzUpHexDigit ∷ Num a ⇒ Char → Maybe a
-fromNzUpHexDigit c | isNzDigit c = Just $ unsafeFromDigit c
-                   | isUpAF c    = Just $ fromUpAF c
-                   | otherwise   = Nothing
+fromNzUpHexDigit c | isNzDecDigit c = Just $ unsafeFromDecDigit c
+                   | isUpAF c       = Just $ fromUpAF c
+                   | otherwise      = Nothing
 {-# INLINABLE fromNzUpHexDigit #-}
 
 -- | Map upper-case hexadecimal digits to the corresponding numbers.
 --   No checks is performed.
 unsafeFromUpHexDigit ∷ Num a ⇒ Char → a
-unsafeFromUpHexDigit c | c < 'A'   = unsafeFromDigit c
+unsafeFromUpHexDigit c | c < 'A'   = unsafeFromDecDigit c
                        | otherwise = fromUpAF c
 {-# INLINE unsafeFromUpHexDigit #-}
 
 -- | Test if a character is a hexadecimal digit
 --   (/'0' ... '9'/ or /'a' ... 'f'/ or /'A' ... 'F'/).
 isHexDigit ∷ Char → Bool
-isHexDigit c = isDigit c || isUpAF c || isLowAF c
+isHexDigit c = isDecDigit c || isUpAF c || isLowAF c
 {-# INLINABLE isHexDigit #-}
 
 -- | Test if a character is a non-zero hexadecimal digit
 --   (/'1' ... '9'/ or /'a' ... 'f'/ or /'A' ... 'F'/).
 isNzHexDigit ∷ Char → Bool
-isNzHexDigit c = isNzDigit c || isUpAF c || isLowAF c
+isNzHexDigit c = isNzDecDigit c || isUpAF c || isLowAF c
 {-# INLINABLE isNzHexDigit #-}
 
 -- | Map hexadecimal digits to the corresponding numbers.
 --   Return 'Nothing' on other inputs.
 fromHexDigit ∷ Num a ⇒ Char → Maybe a
-fromHexDigit c | isDigit c = Just $ unsafeFromDigit c
-               | isUpAF c  = Just $ fromUpAF c
-               | isLowAF c = Just $ fromLowAF c
-               | otherwise = Nothing
+fromHexDigit c | isDecDigit c = Just $ unsafeFromDecDigit c
+               | isUpAF c     = Just $ fromUpAF c
+               | isLowAF c    = Just $ fromLowAF c
+               | otherwise    = Nothing
 {-# INLINABLE fromHexDigit #-}
 
 -- | Map non-zero hexadecimal digits to the corresponding numbers.
 --   Return 'Nothing' on other inputs.
 fromNzHexDigit ∷ Num a ⇒ Char → Maybe a
-fromNzHexDigit c | isNzDigit c = Just $ unsafeFromDigit c
-                 | isUpAF c    = Just $ fromUpAF c
-                 | isLowAF c   = Just $ fromLowAF c
-                 | otherwise   = Nothing
+fromNzHexDigit c | isNzDecDigit c = Just $ unsafeFromDecDigit c
+                 | isUpAF c       = Just $ fromUpAF c
+                 | isLowAF c      = Just $ fromLowAF c
+                 | otherwise      = Nothing
 {-# INLINABLE fromNzHexDigit #-}
 
 -- | Map hexadecimal digits to the corresponding numbers. No checks is
 --   performed.
 unsafeFromHexDigit ∷ Num a ⇒ Char → a
-unsafeFromHexDigit c | c < 'A'   = unsafeFromDigit c
+unsafeFromHexDigit c | c < 'A'   = unsafeFromDecDigit c
                      | c < 'a'   = fromUpAF c
                      | otherwise = fromLowAF c
 {-# INLINE unsafeFromHexDigit #-}
@@ -467,42 +467,42 @@ isAlpha8 ∷ Word8 → Bool
 isAlpha8 w = isUpper8 w || isLower8 w
 {-# INLINABLE isAlpha8 #-}
 
--- | Test if a byte is the encoding of a decimal digit (/'0' ... '9'/).
-isDigit8 ∷ Word8 → Bool
-isDigit8 w = w >= ascii '0' && w <= ascii '9'
-{-# INLINE isDigit8 #-}
-
--- | Test if a byte is the encoding of a non-zero decimal digit
---   (/'1' ... '9'/).
-isNzDigit8 ∷ Word8 → Bool
-isNzDigit8 w = w >= ascii '1' && w <= ascii '9'
-{-# INLINE isNzDigit8 #-}
-
 -- | Test if a byte is the encoding of either an ASCII letter
 --   or a decimal digit.
 isAlphaNum8 ∷ Word8 → Bool
-isAlphaNum8 w = isDigit8 w || isAlpha8 w
+isAlphaNum8 w = isDecDigit8 w || isAlpha8 w
 {-# INLINABLE isAlphaNum8 #-}
+
+-- | Test if a byte is the encoding of a decimal digit (/'0' ... '9'/).
+isDecDigit8 ∷ Word8 → Bool
+isDecDigit8 w = w >= ascii '0' && w <= ascii '9'
+{-# INLINE isDecDigit8 #-}
+
+-- | Test if a byte is the encoding of a non-zero decimal digit
+--   (/'1' ... '9'/).
+isNzDecDigit8 ∷ Word8 → Bool
+isNzDecDigit8 w = w >= ascii '1' && w <= ascii '9'
+{-# INLINE isNzDecDigit8 #-}
 
 -- | Map the encoding of a decimal digit to the corresponding number.
 --   Return 'Nothing' on other inputs.
-fromDigit8 ∷ Num a ⇒ Word8 → Maybe a
-fromDigit8 w | isDigit8 w = Just $ unsafeFromDigit8 w
-             | otherwise  = Nothing
-{-# INLINABLE fromDigit8 #-}
+fromDecDigit8 ∷ Num a ⇒ Word8 → Maybe a
+fromDecDigit8 w | isDecDigit8 w = Just $ unsafeFromDecDigit8 w
+                | otherwise  = Nothing
+{-# INLINABLE fromDecDigit8 #-}
 
 -- | Map the encoding of a non-zero decimal digit to the corresponding number.
 --   Return 'Nothing' on other inputs.
-fromNzDigit8 ∷ Num a ⇒ Word8 → Maybe a
-fromNzDigit8 w | isNzDigit8 w = Just $ unsafeFromDigit8 w
-               | otherwise    = Nothing
-{-# INLINABLE fromNzDigit8 #-}
+fromNzDecDigit8 ∷ Num a ⇒ Word8 → Maybe a
+fromNzDecDigit8 w | isNzDecDigit8 w = Just $ unsafeFromDecDigit8 w
+                  | otherwise       = Nothing
+{-# INLINABLE fromNzDecDigit8 #-}
 
 -- | Map the encoding of a decimal digit to the corresponding number.
 --   No checks is performed.
-unsafeFromDigit8 ∷ Num a ⇒ Word8 → a
-unsafeFromDigit8 w = fromIntegral (w - ascii '0')
-{-# INLINE unsafeFromDigit8 #-}
+unsafeFromDecDigit8 ∷ Num a ⇒ Word8 → a
+unsafeFromDecDigit8 w = fromIntegral (w - ascii '0')
+{-# INLINE unsafeFromDecDigit8 #-}
 
 -- | Test if a byte is the encoding of a binary digit (/'0'/ or /'1'/).
 isBinDigit8 ∷ Word8 → Bool
@@ -531,7 +531,7 @@ fromNzBinDigit8 w | isNzBinDigit8 w = Just 1
 -- | Map the encoding of a binary digit to the corresponding number.
 --   No checks is performed.
 unsafeFromBinDigit8 ∷ Num a ⇒ Word8 → a
-unsafeFromBinDigit8 = unsafeFromDigit8
+unsafeFromBinDigit8 = unsafeFromDecDigit8
 {-# INLINE unsafeFromBinDigit8 #-}
 
 -- | Test if a byte is the encoding of an octal digit (/'0' ... '7'/).
@@ -562,7 +562,7 @@ fromNzOctDigit8 w | isNzOctDigit8 w = Just $ unsafeFromOctDigit8 w
 -- | Map the encoding of an octal digit to the corresponding number.
 --   No checks is performed.
 unsafeFromOctDigit8 ∷ Num a ⇒ Word8 → a
-unsafeFromOctDigit8 = unsafeFromDigit8
+unsafeFromOctDigit8 = unsafeFromDecDigit8
 {-# INLINE unsafeFromOctDigit8 #-}
 
 isLowAF8 ∷ Word8 → Bool
@@ -576,35 +576,35 @@ fromLowAF8 w = fromIntegral (w - ascii 'a' + 10)
 -- | Test if a byte is the encoding of a lower-case hexadecimal digit
 --   (/'0' ... '9'/ or /'a' ... 'f'/).
 isLowHexDigit8 ∷ Word8 → Bool
-isLowHexDigit8 w = isDigit8 w || isLowAF8 w
+isLowHexDigit8 w = isDecDigit8 w || isLowAF8 w
 {-# INLINABLE isLowHexDigit8 #-}
 
 -- | Test if a byte is the encoding of a non-zero lower-case hexadecimal digit
 --   (/'1' ... '9'/ or /'a' ... 'f'/).
 isNzLowHexDigit8 ∷ Word8 → Bool
-isNzLowHexDigit8 w = isNzDigit8 w || isLowAF8 w
+isNzLowHexDigit8 w = isNzDecDigit8 w || isLowAF8 w
 {-# INLINABLE isNzLowHexDigit8 #-}
 
 -- | Map the encoding of a lower-case hexadecimal digit to the corresponding
 --   number. Return 'Nothing' on other inputs.
 fromLowHexDigit8 ∷ Num a ⇒ Word8 → Maybe a
-fromLowHexDigit8 w | isDigit8 w = Just $ unsafeFromDigit8 w
-                   | isLowAF8 w = Just $ fromLowAF8 w
-                   | otherwise  = Nothing
+fromLowHexDigit8 w | isDecDigit8 w = Just $ unsafeFromDecDigit8 w
+                   | isLowAF8 w    = Just $ fromLowAF8 w
+                   | otherwise     = Nothing
 {-# INLINABLE fromLowHexDigit8 #-}
 
 -- | Map the encoding of a non-zero lower-case hexadecimal digit to
 --   the corresponding number. Return 'Nothing' on other inputs.
 fromNzLowHexDigit8 ∷ Num a ⇒ Word8 → Maybe a
-fromNzLowHexDigit8 w | isNzDigit8 w = Just $ unsafeFromDigit8 w
-                     | isLowAF8 w   = Just $ fromLowAF8 w
-                     | otherwise    = Nothing
+fromNzLowHexDigit8 w | isNzDecDigit8 w = Just $ unsafeFromDecDigit8 w
+                     | isLowAF8 w      = Just $ fromLowAF8 w
+                     | otherwise       = Nothing
 {-# INLINABLE fromNzLowHexDigit8 #-}
 
 -- | Map the encoding of a lower-case hexadecimal digit to the corresponding
 --   number. No checks is performed.
 unsafeFromLowHexDigit8 ∷ Num a ⇒ Word8 → a
-unsafeFromLowHexDigit8 w | w < ascii 'a' = unsafeFromDigit8 w
+unsafeFromLowHexDigit8 w | w < ascii 'a' = unsafeFromDecDigit8 w
                          | otherwise     = fromLowAF8 w
 {-# INLINE unsafeFromLowHexDigit8 #-}
 
@@ -619,72 +619,72 @@ fromUpAF8 w = fromIntegral (w - ascii 'A' + 10)
 -- | Test if a byte is the encoding of an upper-case hexadecimal digit
 --   (/'0' ... '9'/ or /'A' ... 'F'/).
 isUpHexDigit8 ∷ Word8 → Bool
-isUpHexDigit8 w = isDigit8 w || isUpAF8 w
+isUpHexDigit8 w = isDecDigit8 w || isUpAF8 w
 {-# INLINABLE isUpHexDigit8 #-}
 
 -- | Test if a byte is the encoding of a non-zero upper-case hexadecimal digit
 --   (/'1' ... '9'/ or /'A' ... 'F'/).
 isNzUpHexDigit8 ∷ Word8 → Bool
-isNzUpHexDigit8 w = isNzDigit8 w || isUpAF8 w
+isNzUpHexDigit8 w = isNzDecDigit8 w || isUpAF8 w
 {-# INLINABLE isNzUpHexDigit8 #-}
 
 -- | Map the encoding of an upper-case hexadecimal digit to the corresponding
 --   number. Return 'Nothing' on other inputs.
 fromUpHexDigit8 ∷ Num a ⇒ Word8 → Maybe a
-fromUpHexDigit8 w | isDigit8 w = Just $ unsafeFromDigit8 w
-                  | isUpAF8 w  = Just $ fromUpAF8 w
-                  | otherwise  = Nothing
+fromUpHexDigit8 w | isDecDigit8 w = Just $ unsafeFromDecDigit8 w
+                  | isUpAF8 w     = Just $ fromUpAF8 w
+                  | otherwise     = Nothing
 {-# INLINABLE fromUpHexDigit8 #-}
 
 -- | Map the encoding of a non-zero upper-case hexadecimal digit to
 --   the corresponding number. Return 'Nothing' on other inputs.
 fromNzUpHexDigit8 ∷ Num a ⇒ Word8 → Maybe a
-fromNzUpHexDigit8 w | isNzDigit8 w = Just $ unsafeFromDigit8 w
-                    | isUpAF8 w    = Just $ fromUpAF8 w
-                    | otherwise    = Nothing
+fromNzUpHexDigit8 w | isNzDecDigit8 w = Just $ unsafeFromDecDigit8 w
+                    | isUpAF8 w       = Just $ fromUpAF8 w
+                    | otherwise       = Nothing
 {-# INLINABLE fromNzUpHexDigit8 #-}
 
 -- | Map the encoding of an upper-case hexadecimal digit to the corresponding
 --   number. No checks is performed.
 unsafeFromUpHexDigit8 ∷ Num a ⇒ Word8 → a
-unsafeFromUpHexDigit8 w | w < ascii 'A' = unsafeFromDigit8 w
+unsafeFromUpHexDigit8 w | w < ascii 'A' = unsafeFromDecDigit8 w
                         | otherwise     = fromUpAF8 w
 {-# INLINE unsafeFromUpHexDigit8 #-}
 
 -- | Test if a byte is the encoding of a hexadecimal digit
 --   (/'0' ... '9'/ or /'a' ... 'f'/ or /'A' ... 'F'/).
 isHexDigit8 ∷ Word8 → Bool
-isHexDigit8 w = isDigit8 w || isUpAF8 w || isLowAF8 w
+isHexDigit8 w = isDecDigit8 w || isUpAF8 w || isLowAF8 w
 {-# INLINABLE isHexDigit8 #-}
 
 -- | Test if a byte is the encoding of a non-zero hexadecimal digit
 --   (/'1' ... '9'/ or /'a' ... 'f'/ or /'A' ... 'F'/).
 isNzHexDigit8 ∷ Word8 → Bool
-isNzHexDigit8 w = isNzDigit8 w || isUpAF8 w || isLowAF8 w
+isNzHexDigit8 w = isNzDecDigit8 w || isUpAF8 w || isLowAF8 w
 {-# INLINABLE isNzHexDigit8 #-}
 
 -- | Map the encoding of a hexadecimal digit to the corresponding
 --   number. Return 'Nothing' on other inputs.
 fromHexDigit8 ∷ Num a ⇒ Word8 → Maybe a
-fromHexDigit8 w | isDigit8 w = Just $ unsafeFromDigit8 w
-                | isUpAF8 w  = Just $ fromUpAF8 w
-                | isLowAF8 w = Just $ fromLowAF8 w
-                | otherwise  = Nothing
+fromHexDigit8 w | isDecDigit8 w = Just $ unsafeFromDecDigit8 w
+                | isUpAF8 w     = Just $ fromUpAF8 w
+                | isLowAF8 w    = Just $ fromLowAF8 w
+                | otherwise     = Nothing
 {-# INLINABLE fromHexDigit8 #-}
 
 -- | Map the encoding of a non-zero hexadecimal digit to the corresponding
 --   number. Return 'Nothing' on other inputs.
 fromNzHexDigit8 ∷ Num a ⇒ Word8 → Maybe a
-fromNzHexDigit8 w | isNzDigit8 w = Just $ unsafeFromDigit8 w
-                  | isUpAF8 w    = Just $ fromUpAF8 w
-                  | isLowAF8 w   = Just $ fromLowAF8 w
-                  | otherwise    = Nothing
+fromNzHexDigit8 w | isNzDecDigit8 w = Just $ unsafeFromDecDigit8 w
+                  | isUpAF8 w       = Just $ fromUpAF8 w
+                  | isLowAF8 w      = Just $ fromLowAF8 w
+                  | otherwise       = Nothing
 {-# INLINABLE fromNzHexDigit8 #-}
 
 -- | Map the encoding of a hexadecimal digit to the corresponding
 --   number. No checks is performed.
 unsafeFromHexDigit8 ∷ Num a ⇒ Word8 → a
-unsafeFromHexDigit8 w | w < ascii 'A' = unsafeFromDigit8 w
+unsafeFromHexDigit8 w | w < ascii 'A' = unsafeFromDecDigit8 w
                       | w < ascii 'a' = fromUpAF8 w
                       | otherwise     = fromLowAF8 w
 {-# INLINE unsafeFromHexDigit8 #-}
