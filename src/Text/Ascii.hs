@@ -146,7 +146,7 @@ maybeAscii c | isAscii c = Just $ ascii c
              | otherwise = Nothing
 {-# INLINABLE maybeAscii #-}
 
--- | Encode an ASCII character. No checks is performed.
+-- | Encode an ASCII character. No checks are performed.
 ascii ∷ Char → Word8
 ascii = fromIntegral . ord
 {-# INLINE ascii #-}
@@ -232,7 +232,7 @@ fromNzDecDigit c | isNzDecDigit c = Just $ unsafeFromDecDigit c
                  | otherwise      = Nothing
 {-# INLINABLE fromNzDecDigit #-}
 
--- | Map decimal digits to the corresponding numbers. No checks is performed.
+-- | Map decimal digits to the corresponding numbers. No checks are performed.
 unsafeFromDecDigit ∷ Num a ⇒ Char → a
 unsafeFromDecDigit c = fromIntegral (ord c - ord '0')
 {-# INLINE unsafeFromDecDigit #-}
@@ -260,7 +260,7 @@ fromNzBinDigit c | isNzBinDigit c = Just 1
                  | otherwise      = Nothing
 {-# INLINABLE fromNzBinDigit #-}
 
--- | Map binary digits to the corresponding numbers. No checks is performed.
+-- | Map binary digits to the corresponding numbers. No checks are performed.
 unsafeFromBinDigit ∷ Num a ⇒ Char → a
 unsafeFromBinDigit = unsafeFromDecDigit
 {-# INLINE unsafeFromBinDigit #-}
@@ -289,7 +289,7 @@ fromNzOctDigit c | isNzOctDigit c = Just $ unsafeFromOctDigit c
                  | otherwise      = Nothing
 {-# INLINABLE fromNzOctDigit #-}
 
--- | Map octal digits to the corresponding numbers. No checks is performed.
+-- | Map octal digits to the corresponding numbers. No checks are performed.
 unsafeFromOctDigit ∷ Num a ⇒ Char → a
 unsafeFromOctDigit = unsafeFromDecDigit
 {-# INLINE unsafeFromOctDigit #-}
@@ -331,7 +331,7 @@ fromNzLowHexDigit c | isNzDecDigit c = Just $ unsafeFromDecDigit c
 {-# INLINABLE fromNzLowHexDigit #-}
 
 -- | Map lower-case hexadecimal digits to the corresponding numbers.
---   No checks is performed.
+--   No checks are performed.
 unsafeFromLowHexDigit ∷ Num a ⇒ Char → a
 unsafeFromLowHexDigit c | c < 'a'   = unsafeFromDecDigit c
                         | otherwise = fromLowAF c
@@ -374,7 +374,7 @@ fromNzUpHexDigit c | isNzDecDigit c = Just $ unsafeFromDecDigit c
 {-# INLINABLE fromNzUpHexDigit #-}
 
 -- | Map upper-case hexadecimal digits to the corresponding numbers.
---   No checks is performed.
+--   No checks are performed.
 unsafeFromUpHexDigit ∷ Num a ⇒ Char → a
 unsafeFromUpHexDigit c | c < 'A'   = unsafeFromDecDigit c
                        | otherwise = fromUpAF c
@@ -410,7 +410,7 @@ fromNzHexDigit c | isNzDecDigit c = Just $ unsafeFromDecDigit c
                  | otherwise      = Nothing
 {-# INLINABLE fromNzHexDigit #-}
 
--- | Map hexadecimal digits to the corresponding numbers. No checks is
+-- | Map hexadecimal digits to the corresponding numbers. No checks are
 --   performed.
 unsafeFromHexDigit ∷ Num a ⇒ Char → a
 unsafeFromHexDigit c | c < 'A'   = unsafeFromDecDigit c
@@ -499,7 +499,7 @@ fromNzDecDigit8 w | isNzDecDigit8 w = Just $ unsafeFromDecDigit8 w
 {-# INLINABLE fromNzDecDigit8 #-}
 
 -- | Map the encoding of a decimal digit to the corresponding number.
---   No checks is performed.
+--   No checks are performed.
 unsafeFromDecDigit8 ∷ Num a ⇒ Word8 → a
 unsafeFromDecDigit8 w = fromIntegral (w - ascii '0')
 {-# INLINE unsafeFromDecDigit8 #-}
@@ -529,7 +529,7 @@ fromNzBinDigit8 w | isNzBinDigit8 w = Just 1
 {-# INLINABLE fromNzBinDigit8 #-}
 
 -- | Map the encoding of a binary digit to the corresponding number.
---   No checks is performed.
+--   No checks are performed.
 unsafeFromBinDigit8 ∷ Num a ⇒ Word8 → a
 unsafeFromBinDigit8 = unsafeFromDecDigit8
 {-# INLINE unsafeFromBinDigit8 #-}
@@ -560,7 +560,7 @@ fromNzOctDigit8 w | isNzOctDigit8 w = Just $ unsafeFromOctDigit8 w
 {-# INLINABLE fromNzOctDigit8 #-}
 
 -- | Map the encoding of an octal digit to the corresponding number.
---   No checks is performed.
+--   No checks are performed.
 unsafeFromOctDigit8 ∷ Num a ⇒ Word8 → a
 unsafeFromOctDigit8 = unsafeFromDecDigit8
 {-# INLINE unsafeFromOctDigit8 #-}
@@ -602,7 +602,7 @@ fromNzLowHexDigit8 w | isNzDecDigit8 w = Just $ unsafeFromDecDigit8 w
 {-# INLINABLE fromNzLowHexDigit8 #-}
 
 -- | Map the encoding of a lower-case hexadecimal digit to the corresponding
---   number. No checks is performed.
+--   number. No checks are performed.
 unsafeFromLowHexDigit8 ∷ Num a ⇒ Word8 → a
 unsafeFromLowHexDigit8 w | w < ascii 'a' = unsafeFromDecDigit8 w
                          | otherwise     = fromLowAF8 w
@@ -645,7 +645,7 @@ fromNzUpHexDigit8 w | isNzDecDigit8 w = Just $ unsafeFromDecDigit8 w
 {-# INLINABLE fromNzUpHexDigit8 #-}
 
 -- | Map the encoding of an upper-case hexadecimal digit to the corresponding
---   number. No checks is performed.
+--   number. No checks are performed.
 unsafeFromUpHexDigit8 ∷ Num a ⇒ Word8 → a
 unsafeFromUpHexDigit8 w | w < ascii 'A' = unsafeFromDecDigit8 w
                         | otherwise     = fromUpAF8 w
@@ -682,7 +682,7 @@ fromNzHexDigit8 w | isNzDecDigit8 w = Just $ unsafeFromDecDigit8 w
 {-# INLINABLE fromNzHexDigit8 #-}
 
 -- | Map the encoding of a hexadecimal digit to the corresponding
---   number. No checks is performed.
+--   number. No checks are performed.
 unsafeFromHexDigit8 ∷ Num a ⇒ Word8 → a
 unsafeFromHexDigit8 w | w < ascii 'A' = unsafeFromDecDigit8 w
                       | w < ascii 'a' = fromUpAF8 w

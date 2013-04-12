@@ -79,7 +79,7 @@ maybeLatin1 c | isLatin1 c = Just $ latin1 c
               | otherwise  = Nothing
 {-# INLINABLE maybeLatin1 #-}
 
--- | Encode a Latin-1 character. No checks is performed.
+-- | Encode a Latin-1 character. No checks are performed.
 latin1 ∷ Char → Word8
 latin1 = fromIntegral . ord
 {-# INLINE latin1 #-}
