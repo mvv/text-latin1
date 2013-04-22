@@ -1,5 +1,8 @@
 {-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 -- | ASCII utility functions.
@@ -96,12 +99,17 @@ module Text.Ascii
   ) where
 
 import Data.Checked
+import Data.Function (on)
 import Data.Char (ord, chr)
+import Data.String (IsString(..))
 import Data.Word (Word8)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as TS
 import qualified Data.Text.Lazy as TL
+import Data.Monoid (Monoid(..))
+import Data.CaseInsensitive (FoldCase(..))
+import Data.Hashable (Hashable(..))
 
 data IsAscii = IsAscii
 
@@ -138,6 +146,61 @@ isAscii = holds IsAscii
 {-# INLINE isAscii #-}
 
 type Ascii α = Checked IsAscii α
+
+instance Eq α ⇒ Eq (Ascii α) where
+  (==) = (==) `on` checked
+  {-# INLINE (==) #-}
+
+instance Ord α ⇒ Ord (Ascii α) where
+  compare = compare `on` checked
+  {-# INLINE compare #-}
+
+instance Show α ⇒ Show (Ascii α) where
+  showsPrec p = showsPrec p . checked
+
+instance Monoid α ⇒ Monoid (Ascii α) where
+  mempty = trustMe mempty
+  {-# INLINE mempty #-}
+  mappend x y = trustMe $ mappend (checked x) (checked y)
+  {-# INLINE mappend #-}
+
+instance IsString α ⇒ IsString (Ascii α) where
+  fromString s | isAscii s = trustMe $ fromString s
+               | otherwise = error $ "Not an ASCII string: " ++ show s
+  {-# INLINE fromString #-}
+
+instance Hashable α ⇒ Hashable (Ascii α) where
+#if MIN_VERSION_hashable(1,2,0)
+  hashWithSalt s = hashWithSalt s . checked
+  {-# INLINE hashWithSalt #-}
+#else
+  hash = hash . checked
+  {-# INLINE hash #-}
+#endif
+
+instance FoldCase (Ascii Char) where
+  foldCase = trustMap toLower
+  {-# INLINE foldCase #-}
+
+instance FoldCase (Ascii α) ⇒ FoldCase (Ascii [α]) where
+  foldCase = trustMap $ map $ checked . foldCase . trustThat IsAscii
+  {-# INLINE foldCase #-}
+
+instance FoldCase (Ascii BS.ByteString) where
+  foldCase = trustMap $ BS.map toLower8
+  {-# INLINE foldCase #-}
+
+instance FoldCase (Ascii BL.ByteString) where
+  foldCase = trustMap $ BL.map toLower8
+  {-# INLINE foldCase #-}
+
+instance FoldCase (Ascii TS.Text) where
+  foldCase = trustMap $ TS.map toLower
+  {-# INLINE foldCase #-}
+
+instance FoldCase (Ascii TL.Text) where
+  foldCase = trustMap $ TL.map toLower
+  {-# INLINE foldCase #-}
 
 -- | Map a character to its ASCII encoding if possible, otherwise
 --   return 'Nothing'.

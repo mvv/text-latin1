@@ -25,9 +25,11 @@ Source-Repository head
 
 Library
   Build-Depends: base >= 4 && < 5
-               , data-checked
+               , data-checked >= 0.2
                , bytestring
                , text
+               , case-insensitive >= 1.0
+               , hashable >= 1.1
   Hs-Source-Dirs: src
   GHC-Options: -Wall
   Exposed-Modules:

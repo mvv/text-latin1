@@ -1,6 +1,9 @@
 {-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 -- | Latin-1 utility functions.
@@ -36,12 +39,17 @@ module Text.Latin1
   ) where
 
 import Data.Checked
+import Data.Function (on)
 import Data.Char (ord, chr)
+import Data.String (IsString(..))
 import Data.Word (Word8)
 import qualified Data.Text as TS
 import qualified Data.Text.Lazy as TL
 import Text.Ascii (Ascii)
 import qualified Text.Ascii as A
+import Data.Monoid (Monoid(..))
+import Data.CaseInsensitive (FoldCase(..))
+import Data.Hashable (Hashable(..))
 
 data IsLatin1 = IsLatin1
 
@@ -66,6 +74,53 @@ isLatin1 = holds IsLatin1
 {-# INLINE isLatin1 #-}
 
 type Latin1 α = Checked IsLatin1 α
+
+instance Eq α ⇒ Eq (Latin1 α) where
+  (==) = (==) `on` checked
+  {-# INLINE (==) #-}
+
+instance Ord α ⇒ Ord (Latin1 α) where
+  compare = compare `on` checked
+  {-# INLINE compare #-}
+
+instance Show α ⇒ Show (Latin1 α) where
+  showsPrec p = showsPrec p . checked
+
+instance Monoid α ⇒ Monoid (Latin1 α) where
+  mempty = trustMe mempty
+  {-# INLINE mempty #-}
+  mappend x y = trustMe $ mappend (checked x) (checked y)
+  {-# INLINE mappend #-}
+
+instance IsString α ⇒ IsString (Latin1 α) where
+  fromString s | isLatin1 s = trustMe $ fromString s
+               | otherwise  = error $ "Not a Latin-1 string: " ++ show s
+  {-# INLINE fromString #-}
+
+instance Hashable α ⇒ Hashable (Latin1 α) where
+#if MIN_VERSION_hashable(1,2,0)
+  hashWithSalt s = hashWithSalt s . checked
+  {-# INLINE hashWithSalt #-}
+#else
+  hash = hash . checked
+  {-# INLINE hash #-}
+#endif
+
+instance FoldCase (Latin1 Char) where
+  foldCase = trustMap toLower
+  {-# INLINE foldCase #-}
+
+instance FoldCase (Latin1 α) ⇒ FoldCase (Latin1 [α]) where
+  foldCase = trustMap $ map $ checked . foldCase . trustThat IsLatin1
+  {-# INLINE foldCase #-}
+
+instance FoldCase (Latin1 TS.Text) where
+  foldCase = trustMap $ TS.map toLower
+  {-# INLINE foldCase #-}
+
+instance FoldCase (Latin1 TL.Text) where
+  foldCase = trustMap $ TL.map toLower
+  {-# INLINE foldCase #-}
 
 -- | ASCII values are Latin-1 values.
 asciiIsLatin1 ∷ Ascii α → Latin1 α
