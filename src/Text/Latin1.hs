@@ -47,6 +47,7 @@ import qualified Data.Text as TS
 import qualified Data.Text.Lazy as TL
 import Text.Ascii (Ascii)
 import qualified Text.Ascii as A
+import Data.Semigroup (Semigroup(..))
 import Data.Monoid (Monoid(..))
 import Data.CaseInsensitive (FoldCase(..))
 import Data.Hashable (Hashable(..))
@@ -86,11 +87,21 @@ instance Ord α ⇒ Ord (Latin1 α) where
 instance Show α ⇒ Show (Latin1 α) where
   showsPrec p = showsPrec p . checked
 
+instance Semigroup α ⇒ Semigroup (Latin1 α) where
+  x <> y = trustMe $ checked x <> checked y
+  {-# INLINE (<>) #-}
+  sconcat = trustMe . sconcat . fmap checked
+  {-# INLINE sconcat #-}
+  stimes n = trustMe . stimes n . checked
+  {-# INLINE stimes #-}
+
 instance Monoid α ⇒ Monoid (Latin1 α) where
   mempty = trustMe mempty
   {-# INLINE mempty #-}
   mappend x y = trustMe $ mappend (checked x) (checked y)
   {-# INLINE mappend #-}
+  mconcat = trustMe . mconcat . fmap checked
+  {-# INLINE mconcat #-}
 
 instance IsString α ⇒ IsString (Latin1 α) where
   fromString s | isLatin1 s = trustMe $ fromString s

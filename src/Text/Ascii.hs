@@ -107,6 +107,7 @@ import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as TS
 import qualified Data.Text.Lazy as TL
+import Data.Semigroup (Semigroup(..))
 import Data.Monoid (Monoid(..))
 import Data.CaseInsensitive (FoldCase(..))
 import Data.Hashable (Hashable(..))
@@ -158,11 +159,21 @@ instance Ord α ⇒ Ord (Ascii α) where
 instance Show α ⇒ Show (Ascii α) where
   showsPrec p = showsPrec p . checked
 
+instance Semigroup α ⇒ Semigroup (Ascii α) where
+  x <> y = trustMe $ checked x <> checked y
+  {-# INLINE (<>) #-}
+  sconcat = trustMe . sconcat . fmap checked
+  {-# INLINE sconcat #-}
+  stimes n = trustMe . stimes n . checked
+  {-# INLINE stimes #-}
+
 instance Monoid α ⇒ Monoid (Ascii α) where
   mempty = trustMe mempty
   {-# INLINE mempty #-}
   mappend x y = trustMe $ mappend (checked x) (checked y)
   {-# INLINE mappend #-}
+  mconcat = trustMe . mconcat . fmap checked
+  {-# INLINE mconcat #-}
 
 instance IsString α ⇒ IsString (Ascii α) where
   fromString s | isAscii s = trustMe $ fromString s

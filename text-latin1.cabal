@@ -34,6 +34,7 @@ Library
                , data-checked >= 0.2
                , bytestring
                , text
+               , semigroups >= 0.18.4
                , case-insensitive >= 1.0
                , hashable >= 1.1
   Hs-Source-Dirs: src
